@@ -1,10 +1,15 @@
+// ignore_for_file: prefer_final_fields, unused_field
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
+import 'PetManagerScreen.dart';
+import 'EditTaskPage.dart';
 
 class TaskListPage extends StatefulWidget {
-  const TaskListPage({super.key});
+  final Pet selectedPet;
+  const TaskListPage({super.key, required this.selectedPet});
 
   @override
   State<TaskListPage> createState() => _TaskListPageState();
@@ -19,15 +24,20 @@ class _TaskListPageState extends State<TaskListPage> {
     if (user == null) {
       return const Center(child: Text('Not logged in'));
     }
+
     return DefaultTabController(
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Your Pet Care Tasks'),
+          title: Text('Tasks for ${widget.selectedPet.name}'),
           bottom: const TabBar(
             tabs: [
-              Tab(text: 'Upcoming'),
-              Tab(text: 'History'),
+              Tab(
+                  child:
+                      Text('Upcoming', style: TextStyle(color: Colors.white))),
+              Tab(
+                  child:
+                      Text('History', style: TextStyle(color: Colors.white))),
             ],
           ),
         ),
@@ -46,9 +56,11 @@ class _TaskListPageState extends State<TaskListPage> {
       stream: FirebaseFirestore.instance
           .collection('users')
           .doc(user!.uid)
+          .collection('pets')
+          .doc(widget.selectedPet.id)
           .collection('tasks')
           .where('status', isEqualTo: status)
-          .orderBy('dateTime')
+          // Removed .orderBy('dateTime')
           .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -61,7 +73,16 @@ class _TaskListPageState extends State<TaskListPage> {
                 : 'No completed tasks.'),
           );
         }
+
         final tasks = snapshot.data!.docs;
+
+        // ✅ Sort locally by dateTime
+        tasks.sort((a, b) {
+          final aDate = (a['dateTime'] as Timestamp?)?.toDate();
+          final bDate = (b['dateTime'] as Timestamp?)?.toDate();
+          return (aDate ?? DateTime(0)).compareTo(bDate ?? DateTime(0));
+        });
+
         return ListView.builder(
           itemCount: tasks.length,
           itemBuilder: (context, index) {
@@ -100,7 +121,11 @@ class _TaskListPageState extends State<TaskListPage> {
                               value: 'delete', child: Text('Delete')),
                         ],
                       )
-                    : null,
+                    : IconButton(
+                        icon: const Icon(Icons.delete, color: Colors.red),
+                        tooltip: 'Delete Task',
+                        onPressed: () => _deleteTask(task.id),
+                      ),
               ),
             );
           },
@@ -126,16 +151,32 @@ class _TaskListPageState extends State<TaskListPage> {
     await FirebaseFirestore.instance
         .collection('users')
         .doc(user!.uid)
+        .collection('pets')
+        .doc(widget.selectedPet.id)
         .collection('tasks')
         .doc(taskId)
         .update({'status': 'done'});
   }
 
   void _editTask(String taskId, Map<String, dynamic> data) async {
-    // TODO: Implement navigation to EditTaskPage
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Edit feature coming soon!')),
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditTaskPage(
+          selectedPet: widget.selectedPet,
+          taskId: taskId,
+          taskData: data,
+        ),
+      ),
     );
+    if (result == true && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Task edited successfully!'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
   }
 
   void _deleteTask(String taskId) async {
@@ -160,6 +201,8 @@ class _TaskListPageState extends State<TaskListPage> {
       await FirebaseFirestore.instance
           .collection('users')
           .doc(user!.uid)
+          .collection('pets')
+          .doc(widget.selectedPet.id)
           .collection('tasks')
           .doc(taskId)
           .delete();

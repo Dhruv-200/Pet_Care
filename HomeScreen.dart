@@ -86,118 +86,124 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     if (selectedPet == null) {
       return const Scaffold(
         body: Center(child: CircularProgressIndicator()),
       );
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Welcome, ${selectedPet!.name}!'),
-        backgroundColor: Colors.teal,
-      ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            const DrawerHeader(
-              decoration: BoxDecoration(color: Colors.teal),
-              child: Text('Menu',
-                  style: TextStyle(color: Colors.white, fontSize: 24)),
-            ),
-            ListTile(
-              leading: const Icon(Icons.person),
-              title: const Text('Profile'),
-              onTap: () {
-                Navigator.pop(context);
-                _navigateToProfile();
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.pets),
-              title: const Text('Change Pet'),
-              onTap: () {
-                Navigator.pop(context);
-                _selectPet();
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.logout),
-              title: const Text('Logout'),
-              onTap: () {
-                Navigator.pop(context);
-                _logout();
-              },
-            ),
-          ],
+    return Theme(
+      data: theme,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('Welcome, ${selectedPet!.name}!'),
+          backgroundColor: theme.appBarTheme.backgroundColor,
         ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Welcome to Pet Care Scheduler!',
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 16),
-            Card(
-              elevation: 4,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
-              child: ListTile(
-                leading: const Icon(Icons.pets, color: Colors.teal),
-                title: const Text('Upcoming Pet Appointments'),
-                subtitle: const Text('Tap to view or add appointments'),
-                trailing: const Icon(Icons.arrow_forward_ios),
-                onTap: _navigateToAppointments,
+        drawer: Drawer(
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: [
+              DrawerHeader(
+                decoration:
+                    BoxDecoration(color: theme.appBarTheme.backgroundColor),
+                child: const Text('Menu',
+                    style: TextStyle(color: Colors.white, fontSize: 24)),
               ),
-            ),
-            const SizedBox(height: 16),
-            Card(
-              elevation: 4,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
-              child: ListTile(
-                leading: const Icon(Icons.medical_services, color: Colors.teal),
-                title: const Text('Medication Reminders'),
-                subtitle: const Text('No reminders set.'),
-                trailing: const Icon(Icons.arrow_forward_ios),
-                onTap: _navigateToMedicationReminders,
+              ListTile(
+                leading: Icon(Icons.person, color: theme.iconTheme.color),
+                title: const Text('Profile'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _navigateToProfile();
+                },
               ),
-            ),
-            const SizedBox(height: 16),
-            Card(
-              elevation: 4,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
-              child: ListTile(
-                leading: const Icon(Icons.fastfood, color: Colors.teal),
-                title: const Text('Feeding Schedule'),
-                subtitle: const Text('No feeding times set.'),
-                trailing: const Icon(Icons.arrow_forward_ios),
-                onTap: _navigateToFeedingSchedule,
+              ListTile(
+                leading: Icon(Icons.pets, color: theme.iconTheme.color),
+                title: const Text('Change Pet'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _selectPet();
+                },
               ),
-            ),
-            const Spacer(),
-            Center(
-              child: ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.teal,
-                  foregroundColor: Colors.white,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8)),
+              ListTile(
+                leading: Icon(Icons.logout, color: theme.iconTheme.color),
+                title: const Text('Logout'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _logout();
+                },
+              ),
+            ],
+          ),
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Welcome to Pet Care Scheduler!',
+                style: theme.textTheme.headlineSmall,
+              ),
+              const SizedBox(height: 16),
+              Card(
+                elevation: theme.cardTheme.elevation,
+                shape: theme.cardTheme.shape,
+                child: ListTile(
+                  leading: Icon(Icons.pets, color: theme.iconTheme.color),
+                  title: const Text('Upcoming Pet Appointments'),
+                  subtitle: const Text('Tap to view or add appointments'),
+                  trailing: Icon(Icons.arrow_forward_ios,
+                      color: theme.iconTheme.color),
+                  onTap: _navigateToAppointments,
                 ),
-                icon: const Icon(Icons.add),
-                label: const Text('Add New Schedule'),
-                onPressed: _addNewSchedule,
               ),
-            ),
-          ],
+              const SizedBox(height: 16),
+              Card(
+                elevation: theme.cardTheme.elevation,
+                shape: theme.cardTheme.shape,
+                child: ListTile(
+                  leading: Icon(Icons.medical_services,
+                      color: theme.iconTheme.color),
+                  title: const Text('Medication Reminders'),
+                  subtitle: const Text('No reminders set.'),
+                  trailing: Icon(Icons.arrow_forward_ios,
+                      color: theme.iconTheme.color),
+                  onTap: _navigateToMedicationReminders,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Card(
+                elevation: theme.cardTheme.elevation,
+                shape: theme.cardTheme.shape,
+                child: ListTile(
+                  leading: Icon(Icons.fastfood, color: theme.iconTheme.color),
+                  title: const Text('Feeding Schedule'),
+                  subtitle: const Text('No feeding times set.'),
+                  trailing: Icon(Icons.arrow_forward_ios,
+                      color: theme.iconTheme.color),
+                  onTap: _navigateToFeedingSchedule,
+                ),
+              ),
+              const Spacer(),
+              Center(
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: theme.primaryColor,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 32, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8)),
+                  ),
+                  icon: const Icon(Icons.add),
+                  label: const Text('Add New Schedule'),
+                  onPressed: _addNewSchedule,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

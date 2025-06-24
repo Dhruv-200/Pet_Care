@@ -1,35 +1,53 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:intl/intl.dart';
 import 'PetManagerScreen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-class AddTaskPage extends StatefulWidget {
+class EditTaskPage extends StatefulWidget {
   final Pet selectedPet;
-  const AddTaskPage({super.key, required this.selectedPet});
+  final String taskId;
+  final Map<String, dynamic> taskData;
+  const EditTaskPage(
+      {super.key,
+      required this.selectedPet,
+      required this.taskId,
+      required this.taskData});
 
   @override
-  State<AddTaskPage> createState() => _AddTaskPageState();
+  State<EditTaskPage> createState() => _EditTaskPageState();
 }
 
-class _AddTaskPageState extends State<AddTaskPage> {
+class _EditTaskPageState extends State<EditTaskPage> {
   final _formKey = GlobalKey<FormState>();
-  String _type = 'Feeding';
+  late String _type;
   DateTime? _dateTime;
-  final TextEditingController _notesController = TextEditingController();
+  late TextEditingController _notesController;
   bool _saving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _type = widget.taskData['type'] ?? 'Feeding';
+    _dateTime = (widget.taskData['dateTime'] as Timestamp?)?.toDate();
+    _notesController =
+        TextEditingController(text: widget.taskData['notes'] ?? '');
+  }
 
   Future<void> _pickDateTime() async {
     final now = DateTime.now();
     final date = await showDatePicker(
       context: context,
-      initialDate: now,
+      initialDate: _dateTime ?? now,
       firstDate: now,
       lastDate: DateTime(now.year + 2),
     );
     if (date == null) return;
     final time = await showTimePicker(
       context: context,
-      initialTime: TimeOfDay.now(),
+      initialTime: _dateTime != null
+          ? TimeOfDay.fromDateTime(_dateTime!)
+          : TimeOfDay.now(),
     );
     if (time == null) return;
     setState(() {
@@ -49,18 +67,17 @@ class _AddTaskPageState extends State<AddTaskPage> {
         .collection('pets')
         .doc(widget.selectedPet.id)
         .collection('tasks')
-        .add({
+        .doc(widget.taskId)
+        .update({
       'type': _type,
       'dateTime': Timestamp.fromDate(_dateTime!),
       'notes': _notesController.text,
-      'status': 'pending',
-      'createdAt': FieldValue.serverTimestamp(),
     });
     setState(() => _saving = false);
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Task added successfully!'),
+          content: Text('Task updated successfully!'),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -71,7 +88,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Add Task for ${widget.selectedPet.name}')),
+      appBar: AppBar(title: const Text('Edit Task')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -97,7 +114,8 @@ class _AddTaskPageState extends State<AddTaskPage> {
               ListTile(
                 title: Text(_dateTime == null
                     ? 'Pick Date & Time'
-                    : '${_dateTime!.toLocal()}'),
+                    : DateFormat('EEE, MMM d, yyyy – h:mm a')
+                        .format(_dateTime!)),
                 trailing: const Icon(Icons.calendar_today),
                 onTap: _pickDateTime,
               ),
@@ -122,7 +140,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
                   ? const Center(child: CircularProgressIndicator())
                   : ElevatedButton.icon(
                       icon: const Icon(Icons.save),
-                      label: const Text('Save Task'),
+                      label: const Text('Update Task'),
                       onPressed: _saveTask,
                     ),
             ],
