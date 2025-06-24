@@ -1,10 +1,11 @@
-import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:pet_care/HomeScreen.dart';
-import 'package:pet_care/signup_page.dart';
-import 'package:pet_care/extension.dart';
+// ignore_for_file: avoid_print, use_build_context_synchronously, unused_local_variable, non_constant_identifier_names, curly_braces_in_flow_control_structures, body_might_complete_normally_nullable
 
-// Define the LoginScreen widget
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:pet_care/HomeScreen.dart';
+import 'package:pet_care/SignupScreen.dart';
+import 'package:pet_care/extensions.dart';
+
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 

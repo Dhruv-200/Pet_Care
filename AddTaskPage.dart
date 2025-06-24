@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'PetManagerScreen.dart';
 
 class AddTaskPage extends StatefulWidget {
-  const AddTaskPage({super.key});
+  final Pet selectedPet;
+  const AddTaskPage({super.key, required this.selectedPet});
 
   @override
   State<AddTaskPage> createState() => _AddTaskPageState();
@@ -44,6 +46,8 @@ class _AddTaskPageState extends State<AddTaskPage> {
     await FirebaseFirestore.instance
         .collection('users')
         .doc(user.uid)
+        .collection('pets')
+        .doc(widget.selectedPet.id)
         .collection('tasks')
         .add({
       'type': _type,
@@ -59,7 +63,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Add Pet Care Task')),
+      appBar: AppBar(title: Text('Add Task for ${widget.selectedPet.name}')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(

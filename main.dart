@@ -1,10 +1,11 @@
+// ignore_for_file: unused_import
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:pet_care/HomeScreen.dart';
+import 'package:pet_care/firebase_options.dart';
 import 'package:pet_care/LoginScreen.dart';
-import 'package:pet_care/HomeScreen.dart'; // Import HomeScreen
-
-import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,7 +33,7 @@ ThemeData petCareThemeData() {
       ),
       iconTheme: IconThemeData(color: Colors.white),
     ),
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       color: Colors.white,
       elevation: 4,
       shape: RoundedRectangleBorder(
@@ -109,6 +110,8 @@ class _PetCareAppState extends State<PetCareApp> {
 }
 
 class AuthGate extends StatelessWidget {
+  const AuthGate({super.key});
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(

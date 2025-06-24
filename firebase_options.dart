@@ -61,7 +61,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyAXHjYt4DKVf0JL3bHXpltrIoBOjINFDfA',
-    appId: '1:1057530757418:android:a86a71eb6eb0b1205c1e53',
+    appId: '1:1057530757418:android:5bd7913e464f520d5c1e53',
     messagingSenderId: '1057530757418',
     projectId: 'pet-care-70608',
     storageBucket: 'pet-care-70608.firebasestorage.app',
